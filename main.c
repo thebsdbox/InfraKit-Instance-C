@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
                     setConsolOutputLevel(logLevel);
                 } else {
                     printf("\nError incorrect log level, maximum 5");
+                    return -1;
                 }
                 break;
             case 'h':
