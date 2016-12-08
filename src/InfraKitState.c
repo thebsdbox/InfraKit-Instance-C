@@ -13,6 +13,7 @@
 
 #include "InfraKitState.h"
 #include "InfraKitPlugin.h"
+#include "InfraKitConsole.h"
 
 #include <string.h>
 
@@ -42,9 +43,8 @@ int setStatePath(char *path)
 
 json_t *openInstanceState()
 {
-    //char *stateFilePath = "/Users/dan/Desktop/state.json";
     if (!statePath) {
-        //WARNING
+        ovPrintError(getPluginTime(), "No State file has been set");
         return NULL;
     }
     json_t *stateJSON;
@@ -59,7 +59,7 @@ json_t *openInstanceState()
 int saveInstanceState(char *jsonData)
 {
     if (!statePath) {
-        //WARNING
+        ovPrintError(getPluginTime(), "No State file has been set");
         return EXIT_FAILURE;
     }
     
@@ -81,25 +81,23 @@ int saveInstanceState(char *jsonData)
  * state file so that other functions can find them and use them to confirm the state.
  */
 
-int appendInstanceToState(profile *foundServer,  json_t *paramsJSON)
+int appendInstanceToState(json_t *paramsJSON, char *name)
 {
     json_t *stateJSON = openInstanceState();
     json_t *instances = json_object_get(stateJSON, "Instances");
-    if (json_object_size(json_object_get(stateJSON, "OneViewInstance")) == 0) {
-        char *oneviewDetails = "{s:s?,s:s?,s:s?,s:s?}";
-    }
+
+
+    
     json_t *tags = json_object_get(paramsJSON, "Tags");
     const char *sha = json_string_value(json_object_get(tags, "infrakit.config_sha"));
     const char *group = json_string_value(json_object_get(tags, "infrakit.group"));
     
-    char *instanceDescription = "{s:s,s:s?,s:{s:s,s:s,s:s,s:s}}";
+    char *instanceDescription = "{s:s,s:s?,s:{s:s,s:s}}";
     
     json_t *descriptionJSON = json_pack(instanceDescription, \
-                                            "ID", foundServer->profileName, \
-                                            "LogicalID", foundServer->availableHardwareURI, \
-                                            "Tags", \
-                                                "hw_uri", foundServer->availableHardwareURI, \
-                                                "retry-count", INSTANCE_RETRY, \
+                                            "ID", name,                  \
+                                            "LogicalID", NULL,              \
+                                            "Tags",                         \
                                                 "infrakit.config_sha", sha, \
                                                 "infrakit.group", group);
     

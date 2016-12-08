@@ -16,7 +16,7 @@
 
 json_t *openInstanceState();
 int saveInstanceState(char *jsonData);
-int appendInstanceToState(profile *foundServer, json_t *paramsJSON);
+int appendInstanceToState(json_t *paramsJSON, char *name);
 int compareInstanceValueToKey(char *key, const char *value);
 int removeInstanceFromState(char *instanceID);
 char *returnValueFromInstanceKey(char *InstanceID, char *key);

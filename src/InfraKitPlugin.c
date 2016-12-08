@@ -164,7 +164,7 @@ char *handlePostData(httpRequest *request)
 
 void handleInterrupt(int s){
     printf("Caught signal %d\n",(int)s);
-    ovPrintError(getPluginTime(), "InfraKit-instance-oneview is exciting, removing UNIX Socket =>");
+    ovPrintError(getPluginTime(), "InfraKit-instance-C is exciting, removing UNIX Socket =>");
     ovPrintError(getPluginTime(), socketPath);
     unlink(socketPath);
 }
@@ -187,7 +187,7 @@ int ovCreateInfraKitInstance()
         return EXIT_FAILURE;
     }
     setConsolOutputLevel(LOGINFO);
-    ovPrintInfo(getPluginTime(), "Starting OneView Instance Plugin");
+    ovPrintInfo(getPluginTime(), "Starting InfraKit Instance Plugin");
     
     /* These two paths will build out to be the path for the socket and the state
      * we will build them out and ensure that the paths are fully created, including
@@ -211,7 +211,7 @@ int ovCreateInfraKitInstance()
         if (response == -1) {
             ovPrintWarning(getPluginTime(), "Directory .InfraKit/state/ may already exist");
         }
-        strcat(buildStatePath, "oneview.json");
+        strcat(buildStatePath, "instance.json");
         statePath = buildStatePath;
     }
 

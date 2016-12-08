@@ -90,17 +90,18 @@ int synchroniseStateWithPhysical()
 char *infraKitInstanceProvision(json_t *params, long long id)
 {
 
-    char *new_instance  = "instance-1243253647";
-    
+    char name[100];
+    sprintf(name, "InfraKit-%llu",id);
+    appendInstanceToState(params, name);
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
 
     char *response;
     json_t *reponseJSON;
-    if (new_instance) {
+    if (params) {
         reponseJSON = json_pack(successProvisionResponse,   "jsonrpc", "2.0",                   \
                                                             "result",                           \
-                                                                "ID", new_instance,             \
+                                                                "ID", name,                     \
                                                             "id", id);
     } else {
         reponseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
@@ -122,10 +123,10 @@ char *infraKitInstanceProvision(json_t *params, long long id)
 
 char *infraKitInstanceDescribe(json_t *params, long long id)
 {
-    if (synchroniseStateWithPhysical() == EXIT_SUCCESS) {
-        printf ("\n Sync \n");
-    }
-    json_t *instanceState = openInstanceState("");
+//    if (synchroniseStateWithPhysical() == EXIT_SUCCESS) {
+//        printf ("\n Sync \n");
+//    }
+    json_t *instanceState = openInstanceState();
     json_t *instanceArray = json_object_get(instanceState, "Instances");
     char *DescriptionResponse = "{s:s,s:{s:[]},s:s?,s:I}";
     json_t *responseJSON = json_pack(DescriptionResponse,   "jsonrpc", "2.0",                   \
