@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
                 }
                 break;
             case 'h':
-                printf("InfraKit Instance Plugin for Docker\n\n Usage:\n ./infrakit-instance-oneview [flags]\n\n Available Commands:\n version\t\t print build version information\n\n Flags:\n\t--name\tPlugin name to advertise\n\t--log\tLogging level, maximum 5 being the most verbose\n\t--state\tPath to a state file to handle instance state information\n\n");
+                printf("InfraKit Instance Plugin for Docker\n\n Usage:\n ./infrakit-instance-c [flags]\n\n Available Commands:\n version\t\t print build version information\n\n Flags:\n\t--name\tPlugin name to advertise\n\t--log\tLogging level, maximum 5 being the most verbose\n\t--state\tPath to a state file to handle instance state information\n\n");
                 return 0;
                 break;
         }
