@@ -16,10 +16,9 @@
 
 json_t *openInstanceState();
 int saveInstanceState(char *jsonData);
-int appendInstanceToState(profile *foundServer, oneviewSession *session, json_t *paramsJSON);
+int appendInstanceToState(profile *foundServer, json_t *paramsJSON);
 int compareInstanceValueToKey(char *key, const char *value);
 int removeInstanceFromState(char *instanceID);
-int loginFromState();
 char *returnValueFromInstanceKey(char *InstanceID, char *key);
 int setStatePath(char *path);
 char *getStatePath();

@@ -13,5 +13,6 @@ int ovCreateInfraKitInstance();
 
 int processInstanceJSON(char *json_text);
 int setSocketName(char *name);
+int stringMatch(char *string1, char *string2);
 
 

@@ -14,8 +14,7 @@
 #include "InfraKitInstance.h"
 #include "InfraKitPlugin.h"
 #include "InfraKitState.h"
-#include "Httpd.h"
-#include "Utils.h"
+#include "InfraKitHTTPD.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,6 +69,29 @@ int setSocketName(char *name)
 }
 
 
+int stringMatch(char *string1, char *string2)
+{
+    if ((string1) && (string2)) {
+        while (*string1 == *string2) {
+            // if both points in strings are null break out of loop
+            if (*string1 == '\0' || *string2 == '\0') {
+                break;
+            }
+            // move onto next character comparison
+            string1++;
+            string2++;
+        }
+        // Have we reached the end of the string whilst both have been the same value
+        if (*string1 == '\0' && *string2 == '\0')
+            return 1; // Return true (compiler)
+        else
+            return 0; // Return false
+    }
+    return 0;
+}
+
+
+
 /* This callback function will take the request data from the HTTPD server
  * process it and build a response and reponse code, that the web
  * server will then send to the client
@@ -91,7 +113,7 @@ char *handlePostData(httpRequest *request)
         
         if (stringMatch((char *)methodName, "Instance.DescribeInstances")) {
 
-            char *response = ovInfraKitInstanceDescribe(params, id);
+            char *response = infraKitInstanceDescribe(params, id);
             ovPrintDebug(getPluginTime(), "Outgoing Response =>");
             ovPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
@@ -109,7 +131,7 @@ char *handlePostData(httpRequest *request)
         if (stringMatch((char *)methodName, "Instance.Provision")) {
             
             json_t *spec = json_object_get(params, "Spec");
-            char *response = ovInfraKitInstanceProvision(spec, id);
+            char *response = infraKitInstanceProvision(spec, id);
             ovPrintDebug(getPluginTime(), "Outgoing Response =>");
             ovPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
@@ -117,7 +139,7 @@ char *handlePostData(httpRequest *request)
             return NULL;
         }
         if (stringMatch((char *)methodName, "Instance.Destroy")) {
-            char *response = ovInfraKitInstanceDestroy(params, id);
+            char *response = infraKitInstanceDestroy(params, id);
             ovPrintDebug(getPluginTime(), "Outgoing Response =>");
             ovPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
@@ -125,7 +147,7 @@ char *handlePostData(httpRequest *request)
             return NULL;
         }
         if (stringMatch((char *)methodName, "Instance.Meta")) {
-            char *response = ovInfraKitInstanceDestroy(params, id);
+            char *response = infraKitInstanceDestroy(params, id);
             ovPrintDebug(getPluginTime(), "Outgoing Response =>");
             ovPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);

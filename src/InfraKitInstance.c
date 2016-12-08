@@ -11,7 +11,7 @@
 
 #include "InfraKitInstance.h"
 #include "InfrakitState.h"
-#include "oneview.h"
+//#include "oneview.h"
 #include <strings.h>
 #include <stdlib.h>
 
@@ -25,8 +25,7 @@ json_int_t parse_error = -32700;
 int synchroniseStateWithPhysical()
 {
 
-    if (loginFromState() == EXIT_SUCCESS) {
-        json_t *StateJSON = openInstanceState("");
+        json_t *StateJSON = openInstanceState();
         json_t *previousInstances = json_object_get(StateJSON, "Instances");
         json_t *previousNonFunctional = json_object_get(StateJSON, "NonFunctional");
         
@@ -46,7 +45,7 @@ int synchroniseStateWithPhysical()
         json_array_foreach(previousNonFunctional, memberIndex, memberValue) {
             const char *hardwareURI = json_string_value(json_object_get(memberValue, "LogicalID"));
             if (hardwareURI) {
-                char *profileURI = serverProfileFromHardwareURI(infrakitSession, (char *) hardwareURI);
+                char *profileURI;
                 if (profileURI) {
                     // Check power state and add to active / non-functional
                     json_array_append(currentInstances, memberValue);
@@ -56,33 +55,10 @@ int synchroniseStateWithPhysical()
         }
         json_array_foreach(previousInstances, memberIndex, memberValue) {
             const char *hardwareURI = json_string_value(json_object_get(memberValue, "LogicalID"));
-            json_t *tags = json_object_get(memberValue, "Tags");
-            const char *counterString = json_string_value(json_object_get(tags, "retry-count"));
-            char *endPointer;
-            long retry_counter = strtol(counterString, &endPointer, 10);
-
-            
-            printf("\n Remaining profile tries %ld\n", retry_counter);
             if (hardwareURI) {
-                char *profileURI = serverProfileFromHardwareURI(infrakitSession, (char *) hardwareURI);
-                if (profileURI && retry_counter > 0) {
-                    
-                    // Check power state and add to active / non-functional
-                    
                     json_array_append(currentInstances, memberValue);
-                    //json_array_append(currentNonFunctional, memberValue);
-                } else if (retry_counter > 0) {
-                    json_int_t updateCounter = retry_counter - 1;
-                    const int n = snprintf(NULL, 0, "%lld", updateCounter);
-                    char buf[n+1];
-                    snprintf(buf, n+1, "%lld", updateCounter);
-                    json_string_set(json_object_get(tags, "retry-count"), buf);
-                    json_array_append(currentInstances, memberValue);
-
-                }
             }
         }
-        
         // Two updated new arrays to replace inside our state
         json_object_set(StateJSON, "Instances", currentInstances);
         json_object_set(StateJSON, "NonFunctional", currentNonFunctional);
@@ -91,8 +67,6 @@ int synchroniseStateWithPhysical()
         saveInstanceState(json_text);
         json_decref(StateJSON);
         return EXIT_SUCCESS;
-    }
-    return EXIT_FAILURE;
 }
 
 
@@ -104,7 +78,7 @@ int synchroniseStateWithPhysical()
   */
 
 
- /* ovInfraKitInstanceProvision(json_t *params, long long id)
+ /* infraKitInstanceProvision(json_t *params, long long id)
   * params = Parameter JSON that the instance uses for configuration
   * id = method call id, to ensure function sycnronisation
   *
@@ -113,18 +87,20 @@ int synchroniseStateWithPhysical()
   */
 
 
-char *ovInfraKitInstanceProvision(json_t *params, long long id)
+char *infraKitInstanceProvision(json_t *params, long long id)
 {
-    profile *newInstance = processInstanceJSON(params, id);
+
+    char *new_instance  = "instance-1243253647";
+    
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
 
     char *response;
     json_t *reponseJSON;
-    if (newInstance) {
+    if (new_instance) {
         reponseJSON = json_pack(successProvisionResponse,   "jsonrpc", "2.0",                   \
                                                             "result",                           \
-                                                                "ID", newInstance->profileName, \
+                                                                "ID", new_instance,             \
                                                             "id", id);
     } else {
         reponseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
@@ -136,7 +112,7 @@ char *ovInfraKitInstanceProvision(json_t *params, long long id)
     return response;
 }
 
-/* ovInfraKitInstanceDescribe(json_t *params, long long id)
+/* infraKitInstanceDescribe(json_t *params, long long id)
  * params = Parameter JSON that the instance uses for configuration
  * id = method call id, to ensure function sycnronisation
  *
@@ -144,7 +120,7 @@ char *ovInfraKitInstanceProvision(json_t *params, long long id)
  * the state of the infrastructure we're hoping to configure.
  */
 
-char *ovInfraKitInstanceDescribe(json_t *params, long long id)
+char *infraKitInstanceDescribe(json_t *params, long long id)
 {
     if (synchroniseStateWithPhysical() == EXIT_SUCCESS) {
         printf ("\n Sync \n");
@@ -163,21 +139,14 @@ char *ovInfraKitInstanceDescribe(json_t *params, long long id)
     return response;
 }
 
-char *ovInfraKitInstanceDestroy(json_t *params, long long id)
+char *infraKitInstanceDestroy(json_t *params, long long id)
 {
     int InstanceRemoved;
 
     const char *instanceID = json_string_value(json_object_get(params, "Instance"));
-    char *physicalID = returnValueFromInstanceKey((char *)instanceID, "LogicalID");
 
-    if (loginFromState() == EXIT_SUCCESS) {
-        if (destroyServerProfile(physicalID) == EXIT_SUCCESS) {
-            if (instanceID) {
-                InstanceRemoved = removeInstanceFromState((char *)instanceID);
-            }
-        }
-    }
-    json_int_t parse_error = -32700;
+    InstanceRemoved = removeInstanceFromState((char *)instanceID);
+
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
     char *response;

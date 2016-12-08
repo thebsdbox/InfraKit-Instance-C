@@ -12,6 +12,8 @@
 
 
 #include "InfraKitState.h"
+#include "InfraKitPlugin.h"
+
 #include <string.h>
 
 char *statePath = NULL;
@@ -79,20 +81,12 @@ int saveInstanceState(char *jsonData)
  * state file so that other functions can find them and use them to confirm the state.
  */
 
-int appendInstanceToState(profile *foundServer, oneviewSession *session, json_t *paramsJSON)
+int appendInstanceToState(profile *foundServer,  json_t *paramsJSON)
 {
     json_t *stateJSON = openInstanceState();
     json_t *instances = json_object_get(stateJSON, "Instances");
     if (json_object_size(json_object_get(stateJSON, "OneViewInstance")) == 0) {
         char *oneviewDetails = "{s:s?,s:s?,s:s?,s:s?}";
-        
-        json_t *oneviewJSON = json_pack(oneviewDetails, \
-                                            "address", session->address, \
-                                            "username", session->username, \
-                                            "password", session->password, \
-                                            "cookie", session->cookie);
-        
-        json_object_set(stateJSON, "OneViewInstance", oneviewJSON);
     }
     json_t *tags = json_object_get(paramsJSON, "Tags");
     const char *sha = json_string_value(json_object_get(tags, "infrakit.config_sha"));

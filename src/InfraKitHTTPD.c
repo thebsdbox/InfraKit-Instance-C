@@ -28,7 +28,7 @@
 #include <stddef.h>
 
 #include "InfraKitHTTPD.h"
-#include "oneviewUtils.h"
+#include "InfraKitPlugin.h"
 
 // Function Prototypes
 int receive(int socket);
