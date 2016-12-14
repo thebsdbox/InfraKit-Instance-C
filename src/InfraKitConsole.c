@@ -9,6 +9,8 @@
  * This software may be modified and distributed under the terms
  * of the BSD license.  See the LICENSE file for details.
  */
+
+
 #include "InfraKitConsole.h"
 #include <stdio.h>
 
@@ -30,7 +32,7 @@ int setConsolOutputLevel(unsigned int level)
     return EXIT_SUCCESS;
 }
 
-int ovPrintCritical(signed long pluginTime, char *message)
+int ikPrintCritical(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGCRITICAL) {
         printf(ANSI_COLOR_MAGENTA"CRIT[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);
@@ -39,7 +41,7 @@ int ovPrintCritical(signed long pluginTime, char *message)
     return EXIT_FAILURE;
 }
 
-int ovPrintError(signed long pluginTime, char *message)
+int ikPrintError(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGERROR) {
         printf(ANSI_COLOR_RED"ERRO[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);
@@ -48,7 +50,7 @@ int ovPrintError(signed long pluginTime, char *message)
     return EXIT_FAILURE;
 }
 
-int ovPrintWarning(signed long pluginTime, char *message)
+int ikPrintWarning(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGWARNING) {
         printf(ANSI_COLOR_YELLOW"WARN[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);
@@ -57,7 +59,7 @@ int ovPrintWarning(signed long pluginTime, char *message)
     return EXIT_FAILURE;
 }
 
-int ovPrintNotice(signed long pluginTime, char *message)
+int ikPrintNotice(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGNOTICE) {
         printf(ANSI_COLOR_GREEN"NOTE[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);
@@ -66,7 +68,7 @@ int ovPrintNotice(signed long pluginTime, char *message)
     return EXIT_FAILURE;
 }
 
-int ovPrintInfo(signed long pluginTime, char *message)
+int ikPrintInfo(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGINFO) {
         printf(ANSI_COLOR_BLUE"INFO[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);
@@ -75,7 +77,7 @@ int ovPrintInfo(signed long pluginTime, char *message)
     return EXIT_FAILURE;
 }
 
-int ovPrintDebug(signed long pluginTime, char *message)
+int ikPrintDebug(signed long pluginTime, char *message)
 {
     if (outputLevel >= LOGDEBUG) {
         printf(ANSI_COLOR_BLUE"DEBG[%05zu]"ANSI_COLOR_RESET" %s\n", pluginTime, message);

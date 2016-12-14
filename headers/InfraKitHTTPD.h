@@ -37,15 +37,9 @@ typedef struct {
 
 
 #define BUFFER_SIZE 1024*1024
-#define MAX_FILE_SIZE 5*1024
-#define TRUE 1
-#define FALSE 0
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
-#define OV_HTTPD_GET 1
-#define OV_HTTPD_HEAD 2
-#define OV_HTTPD_POST 3
 
 
 void start();

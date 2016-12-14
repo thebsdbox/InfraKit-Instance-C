@@ -44,14 +44,14 @@ int setStatePath(char *path)
 json_t *openInstanceState()
 {
     if (!statePath) {
-        ovPrintError(getPluginTime(), "No State file has been set");
+        ikPrintError(getPluginTime(), "No State file has been set");
         return NULL;
     }
     json_t *stateJSON;
     json_error_t error;
     stateJSON = json_load_file(statePath, 0, &error);
     if (!stateJSON) {
-        stateJSON = json_pack("{s:{},s:[],s:[]}", "OneViewInstance", "Instances", "NonFunctional");
+        stateJSON = json_pack("{s:{},s:[],s:[]}", "Provider", "Instances", "NonFunctional");
     }
     return stateJSON;
 }
@@ -59,7 +59,7 @@ json_t *openInstanceState()
 int saveInstanceState(char *jsonData)
 {
     if (!statePath) {
-        ovPrintError(getPluginTime(), "No State file has been set");
+        ikPrintError(getPluginTime(), "No State file has been set");
         return EXIT_FAILURE;
     }
     
@@ -77,7 +77,7 @@ int saveInstanceState(char *jsonData)
 
 
 /* This function will take a new profile, and attach the various details to the state data
- * HardwareURI, InstanceID (profile Name), it will also place the OneView credentials in the
+ * InstanceID , it will also place the Provider details in the
  * state file so that other functions can find them and use them to confirm the state.
  */
 
@@ -85,9 +85,17 @@ int appendInstanceToState(json_t *paramsJSON, char *name)
 {
     json_t *stateJSON = openInstanceState();
     json_t *instances = json_object_get(stateJSON, "Instances");
-
-
     
+    /* Check the contents of the provider and add in the necessary details to place
+     * information that the plugin will make use of to provision instances, details will
+     * probably need to be taken from the params JSON.
+     */
+    
+    json_t *provider = json_object_get(stateJSON, "Provider");
+    if (provider) {
+
+    }
+
     json_t *tags = json_object_get(paramsJSON, "Tags");
     const char *sha = json_string_value(json_object_get(tags, "infrakit.config_sha"));
     const char *group = json_string_value(json_object_get(tags, "infrakit.group"));

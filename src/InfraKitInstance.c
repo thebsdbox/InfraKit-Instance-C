@@ -21,7 +21,7 @@ json_int_t parse_error = -32700;
  * the physical Infrastructure state.
  */
 
-int synchroniseStateWithPhysical()
+int synchroniseStateWithProvider()
 {
 
         json_t *StateJSON = openInstanceState();
@@ -35,29 +35,40 @@ int synchroniseStateWithPhysical()
         
         size_t memberIndex;
         json_t *memberValue;
-        
-        /*  If one member is part of both it will compound the problem...
-         *
-         */
-        
-        
+    
         json_array_foreach(previousNonFunctional, memberIndex, memberValue) {
-            const char *hardwareURI = json_string_value(json_object_get(memberValue, "LogicalID"));
-            if (hardwareURI) {
-                char *profileURI;
-                if (profileURI) {
-                    // Check power state and add to active / non-functional
-                    json_array_append(currentInstances, memberValue);
+            const char *logicalID = json_string_value(json_object_get(memberValue, "LogicalID"));
+            if (logicalID) {
+                if (logicalID) {
+                    
+                    
+                    /* CODE HERE -> Check with the provider if an instance we previously deemed non-functional,
+                     * has changed it's state back to functional, or alternatively been removed.
+                     */
+                    
+                    
+                    // If the Instance is operational ->
+                    //json_array_append(currentInstances, memberValue);
+                    
+                    // If the instance is still non-functional ->
                     //json_array_append(currentNonFunctional, memberValue);
+                    
                 }
             }
         }
         json_array_foreach(previousInstances, memberIndex, memberValue) {
-            const char *hardwareURI = json_string_value(json_object_get(memberValue, "LogicalID"));
-            if (hardwareURI) {
+            const char *logicalID = json_string_value(json_object_get(memberValue, "LogicalID"));
+            if (logicalID) {
+                
+                    /* CODE HERE -> Check the provider that the instance created still exists, if
+                     * it does then add the existing instance to the array. If not
+                     * then it will effectively be removed and InfraKit will create a new instance.
+                     */
+                
                     json_array_append(currentInstances, memberValue);
             }
         }
+    
         // Two updated new arrays to replace inside our state
         json_object_set(StateJSON, "Instances", currentInstances);
         json_object_set(StateJSON, "NonFunctional", currentNonFunctional);
@@ -75,6 +86,49 @@ int synchroniseStateWithPhysical()
   * provide the capability for provisioning, monitoring and destroying of infrastructure.
   *
   */
+
+
+/* infraKitInstanceValidate(json_t *params, long long id)
+ * params = Parameter JSON that the instance uses for configuration
+ * id = method call id, to ensure function sycnronisation
+ *
+ * Validate the JSON that has been passed as the parameters
+ *
+ */
+
+
+char *infraKitInstanceValidate(json_t *params, long long id)
+{
+    
+
+    /* CODE HERE -> change the name structure above if needed
+     * take the params json and apply it to your infrastructure instance provider
+     * then report back if succesful or failure.
+     *
+     */
+    
+    
+    
+    char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
+    char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
+    
+    char *response;
+    json_t *responseJSON;
+    if (params) {
+        responseJSON = json_pack(successProvisionResponse,  "jsonrpc", "2.0",                   \
+                                                            "result",                           \
+                                                                "ID", "",                       \
+                                                            "id", id);
+    } else {
+        responseJSON = json_pack(failProvisionResponse,     "jsonrpc", "2.0",                   \
+                                                            "error",                            \
+                                                                "code", parse_error,            \
+                                                            "id", id);
+    }
+    response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
+    json_decref(responseJSON);
+    return response;
+}
 
 
  /* infraKitInstanceProvision(json_t *params, long long id)
@@ -107,19 +161,20 @@ char *infraKitInstanceProvision(json_t *params, long long id)
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
 
     char *response;
-    json_t *reponseJSON;
+    json_t *responseJSON;
     if (params) {
-        reponseJSON = json_pack(successProvisionResponse,   "jsonrpc", "2.0",                   \
-                                                            "result",                           \
-                                                                "ID", name,                     \
+        responseJSON = json_pack(successProvisionResponse,   "jsonrpc", "2.0",                   \
+                                                             "result",                           \
+                                                                 "ID", name,                     \
                                                             "id", id);
     } else {
-        reponseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
-                                                            "error",                            \
-                                                                "code", parse_error,            \
+        responseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
+                                                             "error",                            \
+                                                                 "code", parse_error,            \
                                                             "id", id);
     }
-    response = json_dumps(reponseJSON, JSON_ENSURE_ASCII);
+    response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
+    json_decref(responseJSON);
     return response;
 }
 
@@ -155,42 +210,57 @@ char *infraKitInstanceDescribe(json_t *params, long long id)
     json_t *array = json_object_get(responseJSON, "result");
     json_object_set(array, "Descriptions", instanceArray);
     char *response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
+    json_decref(responseJSON);
     return response;
 }
 
+/* infraKitInstanceDestroy(json_t *params, long long id)
+ * params = Parameter JSON that the instance uses for configuration
+ * id = method call id, to ensure function sycnronisation
+ *
+ * This function should use get take the instance that InfraKit wants to destroy, compare the 
+ * provider details with that of internal state and take care of destroying the instance and 
+ * returning either success or failure to InfraKit
+ */
+
 char *infraKitInstanceDestroy(json_t *params, long long id)
 {
-    int InstanceRemoved;
 
     const char *instanceID = json_string_value(json_object_get(params, "Instance"));
 
-    
     
     /* CODE HERE -> take the instanceID from InfraKit and remove it from the instance 
      * provider, verify the instance is removed then update the internal state.
      */
     
-    
-    InstanceRemoved = removeInstanceFromState((char *)instanceID);
+    int instanceRemoved = removeInstanceFromState((char *)instanceID);
 
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
     char *response;
-    json_t *reponseJSON;
-    if (InstanceRemoved == EXIT_SUCCESS) {
+    json_t *responseJSON;
+    if (instanceRemoved == EXIT_SUCCESS) {
          //Describe Instances function
-        reponseJSON = json_pack(successProvisionResponse,  "jsonrpc", "2.0",                    \
+        responseJSON = json_pack(successProvisionResponse,  "jsonrpc", "2.0",                    \
                                                             "result",                           \
                                                                 "Instance", instanceID,         \
                                                             "id", id);
     } else {
-        reponseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
+        responseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
                                                             "error",                            \
                                                                 "code", parse_error,            \
                                                             "id", id);
     }
-    response = json_dumps(reponseJSON, JSON_ENSURE_ASCII);
+    response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
+    json_decref(responseJSON);
     return response;
 
+}
+
+char *infraKitInstanceMeta(json_t *params, long long id)
+{
+    
+    //TODO
+    return NULL;
 }
 

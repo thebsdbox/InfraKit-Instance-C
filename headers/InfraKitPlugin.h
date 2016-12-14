@@ -9,7 +9,7 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
-int ovCreateInfraKitInstance();
+int infraKitCreateInstance();
 
 int processInstanceJSON(char *json_text);
 int setSocketName(char *name);

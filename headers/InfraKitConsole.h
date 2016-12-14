@@ -21,9 +21,9 @@
 
 int setConsolOutputLevel(unsigned int level);
 
-int ovPrintCritical(signed long pluginTime, char *message);
-int ovPrintError(signed long pluginTime, char *message);
-int ovPrintWarning(signed long pluginTime, char *message);
-int ovPrintNotice(signed long pluginTime, char *message);
-int ovPrintInfo(signed long pluginTime, char *message);
-int ovPrintDebug(signed long pluginTime, char *message);
+int ikPrintCritical(signed long pluginTime, char *message);
+int ikPrintError(signed long pluginTime, char *message);
+int ikPrintWarning(signed long pluginTime, char *message);
+int ikPrintNotice(signed long pluginTime, char *message);
+int ikPrintInfo(signed long pluginTime, char *message);
+int ikPrintDebug(signed long pluginTime, char *message);

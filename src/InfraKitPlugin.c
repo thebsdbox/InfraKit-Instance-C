@@ -108,23 +108,24 @@ char *handlePostData(httpRequest *request)
         long long id = json_integer_value(json_object_get(requestJSON, "id"));
         json_t *params = json_object_get(requestJSON, "params");
         const char *debugMessage = json_dumps(requestJSON, JSON_INDENT(3));
-        ovPrintDebug(getPluginTime(), "Incoming Request =>");
-        ovPrintDebug(getPluginTime(), (char*)debugMessage);
+        ikPrintDebug(getPluginTime(), "Incoming Request =>");
+        ikPrintDebug(getPluginTime(), (char*)debugMessage);
         
         if (stringMatch((char *)methodName, "Instance.DescribeInstances")) {
 
             char *response = infraKitInstanceDescribe(params, id);
-            ovPrintDebug(getPluginTime(), "Outgoing Response =>");
-            ovPrintDebug(getPluginTime(), response);
+            ikPrintDebug(getPluginTime(), "Outgoing Response =>");
+            ikPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
             json_decref(requestJSON);
             return NULL;
         }
         if (stringMatch((char *)methodName, "Instance.Validate")) {
             
-            json_t *reponseJSON = json_pack("{s:{s:b},s:s?,s:I}", "result", "OK", JSON_TRUE, "error", NULL, "id", id);
-            char *test = json_dumps(reponseJSON, JSON_ENSURE_ASCII);
-            setHTTPResponse(test, 200);
+            char *response = infraKitInstanceValidate(params, id);
+            ikPrintDebug(getPluginTime(), "Outgoing Response =>");
+            ikPrintDebug(getPluginTime(), response);
+            setHTTPResponse(response, 200);
             json_decref(requestJSON);
             return NULL;
         }
@@ -132,30 +133,30 @@ char *handlePostData(httpRequest *request)
             
             json_t *spec = json_object_get(params, "Spec");
             char *response = infraKitInstanceProvision(spec, id);
-            ovPrintDebug(getPluginTime(), "Outgoing Response =>");
-            ovPrintDebug(getPluginTime(), response);
+            ikPrintDebug(getPluginTime(), "Outgoing Response =>");
+            ikPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
             json_decref(requestJSON);
             return NULL;
         }
         if (stringMatch((char *)methodName, "Instance.Destroy")) {
             char *response = infraKitInstanceDestroy(params, id);
-            ovPrintDebug(getPluginTime(), "Outgoing Response =>");
-            ovPrintDebug(getPluginTime(), response);
+            ikPrintDebug(getPluginTime(), "Outgoing Response =>");
+            ikPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
             json_decref(requestJSON);
             return NULL;
         }
         if (stringMatch((char *)methodName, "Instance.Meta")) {
-            char *response = infraKitInstanceDestroy(params, id);
-            ovPrintDebug(getPluginTime(), "Outgoing Response =>");
-            ovPrintDebug(getPluginTime(), response);
+            char *response = infraKitInstanceMeta(params, id);
+            ikPrintDebug(getPluginTime(), "Outgoing Response =>");
+            ikPrintDebug(getPluginTime(), response);
             setHTTPResponse(response, 200);
             json_decref(requestJSON);
             return NULL;
         }
         if (methodName) {
-            ovPrintError(getPluginTime(), "Unknown JSON-RPC Method");
+            ikPrintError(getPluginTime(), "Unknown JSON-RPC Method");
         }
         json_decref(requestJSON);
     }
@@ -164,8 +165,8 @@ char *handlePostData(httpRequest *request)
 
 void handleInterrupt(int s){
     printf("Caught signal %d\n",(int)s);
-    ovPrintError(getPluginTime(), "InfraKit-instance-C is exciting, removing UNIX Socket =>");
-    ovPrintError(getPluginTime(), socketPath);
+    ikPrintError(getPluginTime(), "InfraKit-instance-C is exciting, removing UNIX Socket =>");
+    ikPrintError(getPluginTime(), socketPath);
     unlink(socketPath);
 }
 
@@ -179,7 +180,7 @@ void setInterruptHandler()
     
 }
 
-int ovCreateInfraKitInstance()
+int infraKitCreateInstance()
 {
     setInterruptHandler();
     
@@ -187,7 +188,7 @@ int ovCreateInfraKitInstance()
         return EXIT_FAILURE;
     }
     setConsolOutputLevel(LOGINFO);
-    ovPrintInfo(getPluginTime(), "Starting InfraKit Instance Plugin");
+    ikPrintInfo(getPluginTime(), "Starting InfraKit Instance Plugin");
     
     /* These two paths will build out to be the path for the socket and the state
      * we will build them out and ensure that the paths are fully created, including
@@ -199,7 +200,7 @@ int ovCreateInfraKitInstance()
     int response = 0;
     response = mkdir(socketPath, 0755);
     if (response == -1) {
-        ovPrintWarning(getPluginTime(), "Directory .InfraKit may already exist");
+        ikPrintWarning(getPluginTime(), "Directory .InfraKit may already exist");
     }
     
     
@@ -209,7 +210,7 @@ int ovCreateInfraKitInstance()
         sprintf(buildStatePath, "%sstate/",socketPath);
         response = mkdir(buildStatePath, 0755);
         if (response == -1) {
-            ovPrintWarning(getPluginTime(), "Directory .InfraKit/state/ may already exist");
+            ikPrintWarning(getPluginTime(), "Directory .InfraKit/state/ may already exist");
         }
         strcat(buildStatePath, "instance.json");
         statePath = buildStatePath;
@@ -219,7 +220,7 @@ int ovCreateInfraKitInstance()
     strcat(socketPath, "plugins/");
     response = mkdir(socketPath, 0755);
     if (response == -1) {
-        ovPrintWarning(getPluginTime(), "Directory .InfraKit/plugins/ may already exist");
+        ikPrintWarning(getPluginTime(), "Directory .InfraKit/plugins/ may already exist");
     }
     
     if (socketName) {
@@ -229,10 +230,10 @@ int ovCreateInfraKitInstance()
     }
     
     
-    ovPrintInfo(getPluginTime(), "Path for UNIX Socket =>");
-    ovPrintInfo(getPluginTime(), socketPath);
-    ovPrintInfo(getPluginTime(), "Path for State File =>");
-    ovPrintInfo(getPluginTime(), statePath);
+    ikPrintInfo(getPluginTime(), "Path for UNIX Socket =>");
+    ikPrintInfo(getPluginTime(), socketPath);
+    ikPrintInfo(getPluginTime(), "Path for State File =>");
+    ikPrintInfo(getPluginTime(), statePath);
     
     setSocketPath(socketPath);
     setStatePath(statePath);

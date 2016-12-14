@@ -9,7 +9,6 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
-//#include "oneview.h"
 #include "InfraKitInstance.h"
 
 #include "jansson.h"
