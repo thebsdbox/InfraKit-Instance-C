@@ -14,7 +14,16 @@
 #include <strings.h>
 #include <stdlib.h>
 
-json_int_t parse_error = -32700;
+ /* JSON-RPC 2.0 error codes, for more info visit:
+  * http://www.jsonrpc.org/specification
+  */
+
+json_int_t JSON_RPC_PARSE_ERROR = -32700;
+json_int_t JSON_RPC_INVALID_REQUEST = -32600;
+json_int_t JSON_RPC_METHOD_NOTFOUND = -32601;
+json_int_t JSON_RPC_INVALID_PARAMS = -32602;
+json_int_t JSON_RPC_INTERNAL_ERROR = -32602;
+
 
 /* Check through the state file and compare the physical state
  * then update the state file so that InfraKit is kept current with
@@ -122,7 +131,7 @@ char *infraKitInstanceValidate(json_t *params, long long id)
     } else {
         responseJSON = json_pack(failProvisionResponse,     "jsonrpc", "2.0",                   \
                                                             "error",                            \
-                                                                "code", parse_error,            \
+                                                                "code", JSON_RPC_PARSE_ERROR,   \
                                                             "id", id);
     }
     response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
@@ -170,7 +179,7 @@ char *infraKitInstanceProvision(json_t *params, long long id)
     } else {
         responseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
                                                              "error",                            \
-                                                                 "code", parse_error,            \
+                                                                 "code", JSON_RPC_PARSE_ERROR,   \
                                                             "id", id);
     }
     response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
@@ -242,13 +251,13 @@ char *infraKitInstanceDestroy(json_t *params, long long id)
     if (instanceRemoved == EXIT_SUCCESS) {
          //Describe Instances function
         responseJSON = json_pack(successProvisionResponse,  "jsonrpc", "2.0",                    \
-                                                            "result",                           \
-                                                                "Instance", instanceID,         \
+                                                            "result",                            \
+                                                                "Instance", instanceID,          \
                                                             "id", id);
     } else {
         responseJSON = json_pack(failProvisionResponse,      "jsonrpc", "2.0",                   \
-                                                            "error",                            \
-                                                                "code", parse_error,            \
+                                                             "error",                            \
+                                                                "code", JSON_RPC_PARSE_ERROR,    \
                                                             "id", id);
     }
     response = json_dumps(responseJSON, JSON_ENSURE_ASCII);
