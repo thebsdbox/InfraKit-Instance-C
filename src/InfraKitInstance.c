@@ -11,7 +11,6 @@
 
 #include "InfraKitInstance.h"
 #include "InfrakitState.h"
-//#include "oneview.h"
 #include <strings.h>
 #include <stdlib.h>
 
@@ -92,6 +91,17 @@ char *infraKitInstanceProvision(json_t *params, long long id)
 
     char name[100];
     sprintf(name, "InfraKit-%llu",id);
+    
+    
+    
+    /* CODE HERE -> change the name structure above if needed
+     * take the params json and apply it to your infrastructure instance provider
+     * then report back if succesful or failure.
+     *
+     */
+    
+    
+    
     appendInstanceToState(params, name);
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
     char *failProvisionResponse = "{s:s,s:{s:i},s:I}";
@@ -123,9 +133,17 @@ char *infraKitInstanceProvision(json_t *params, long long id)
 
 char *infraKitInstanceDescribe(json_t *params, long long id)
 {
-//    if (synchroniseStateWithPhysical() == EXIT_SUCCESS) {
-//        printf ("\n Sync \n");
-//    }
+
+    
+    
+    
+    /* CODE HERE -> Write code to speak with the instance provider
+     * compare it with our internal state and determine the differences
+     * then report the instance description back to InfraKit
+     */
+
+    
+    
     json_t *instanceState = openInstanceState();
     json_t *instanceArray = json_object_get(instanceState, "Instances");
     char *DescriptionResponse = "{s:s,s:{s:[]},s:s?,s:I}";
@@ -146,6 +164,13 @@ char *infraKitInstanceDestroy(json_t *params, long long id)
 
     const char *instanceID = json_string_value(json_object_get(params, "Instance"));
 
+    
+    
+    /* CODE HERE -> take the instanceID from InfraKit and remove it from the instance 
+     * provider, verify the instance is removed then update the internal state.
+     */
+    
+    
     InstanceRemoved = removeInstanceFromState((char *)instanceID);
 
     char *successProvisionResponse = "{s:s,s:{s:s?},s:I}";
