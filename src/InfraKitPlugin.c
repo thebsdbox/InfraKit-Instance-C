@@ -110,7 +110,15 @@ char *handlePostData(httpRequest *request)
         const char *debugMessage = json_dumps(requestJSON, JSON_INDENT(3));
         ikPrintDebug(getPluginTime(), "Incoming Request =>");
         ikPrintDebug(getPluginTime(), (char*)debugMessage);
-        
+        if (stringMatch((char *)methodName, "Plugin.Implements")) {
+            //{"jsonrpc":"2.0","result":{"APIs":[{"Name":"Instance","Version":"0.1.0"}]},"id":3618748489630577360}
+            
+            json_t *reponseJSON = json_pack("{s:s,s:{s:[{s:s,s:s}]},s:I}", "jsonrpc", "2.0", "result", "APIs", "Name", "Instance", "Version", "0.1.0", "id", id);
+            char *test = json_dumps(reponseJSON, JSON_ENSURE_ASCII);
+            setHTTPResponse(test, 200);
+            json_decref(requestJSON);
+            return NULL;
+        }
         if (stringMatch((char *)methodName, "Instance.DescribeInstances")) {
 
             char *response = infraKitInstanceDescribe(params, id);

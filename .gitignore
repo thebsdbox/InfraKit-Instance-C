@@ -1,0 +1,8 @@
+
+headers/jansson_config.h
+
+headers/jansson.h
+
+libjansson.a
+
+InfraKit-Instance-C/
